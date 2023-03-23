@@ -9,7 +9,7 @@ echo "Enter ports space-delimited (e.g. 21-23 80): "
 read ports
 for ((i=$start; $i<=$end; i++))
 do
-    echo -n read_input | timeout 0.3 nc -nvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
+    echo -n read_input | timeout 0.15 nc -nvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
     #nc -nvzw1 $net.$i $ports 2>&1 | grep -E 'succ|open'
 done
 # (-v) running verbosely (-v on Linux, -vv on Windows),
