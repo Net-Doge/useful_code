@@ -1,2 +1,301 @@
-# bash
-Useful Bash scripts
+# Shortcuts
+# q - Quit
+# ctl + c = run job in background
+# z = clear screen
+
+
+Reboot from Factory Reset
+# Connect the PA via the console cable
+# Power on
+# When asked to exit the ZTP mode and configur eyour firewall in standard mode, type YES
+
+# System Will Reboot, wait 5min
+
+# Default Creds: admin:admin
+
+console@PaloAlto> configure
+
+console@PaloAlto# set deviceconfig system hostname FW-19
+console@PaloAlto# set deviceconfig system ip-address 192.168.1.19 netmask 255.255.255.0
+console@PaloAlto# set deviceconfig system default-gateway 192.168.1.1
+console@PaloAlto# set deviceconfig system dns-setting servers primary 8.8.8.8
+console@PaloAlto# set deviceconfig system dns-setting servers secondary 1.1.1.1
+console@PaloAlto# set deviceconfig system primary-ntp-server ntp-server-address 1.2.3.4
+
+console@PaloAlto# commit
+
+# Connect the MGT Cable to the PC
+# SSH AND HTTPS now should be open
+
+ssh@PaloAlto> show system info
+
+# HTTPS
+# Configure Widgets in Dashboard
+# Device tab > Setup
+    # Configure this as needed
+    # Enable SSH and HTTPS and PING
+
+# Device tab > Licences
+    # apply the licenses
+
+# Device tab > Dynamic Updates
+    # Check Now
+    # Download and Install Applications and Threats update
+    # Download and Install other updates needed
+    # After the updates install, the "Antivirus Tab" will reveal after a "Check Now" refresh
+
+
+ZONES AND L3 INTERFACES
+Zones
+# Network tab > Zones
+    # Add
+    # Name: Inside
+    # Type: Layer3
+    # OK
+
+    # Add
+    # Name: Outside
+    # Type: Layer3
+    # OK
+
+Interfaces
+# Network tab > Interfaces
+    # ethernet1/1
+        # Interface Type: Layer3
+        # Config
+            # Virtual Router: default
+            # Security Zone: Inside
+        # IPv4
+            # Add
+            # 10.10.0.19/24
+        # OK
+
+    # ethernet1/4
+        # Interface Type: Layer3
+        # Config
+            # Virtual Router: default
+            # Security Zone: Outside
+        # IPv4
+            # Add
+            # 23.1.2.19/24
+        # OK
+
+    # ethernet1/1
+        # Interface Type: Layer3
+        # Config
+            # Virtual Router: default
+            # Security Zone: Outside
+        # IPv4
+            # Add
+            # 24.1.2.19/24
+        # OK
+
+
+# CLICK COMMIT
+
+# Plug in the appropriate cables to the appropriate ports
+# Test the connectivity with a ping (make sure the source is defined because default is the MGT port)
+
+ssh@PaloALto> ping source 24.1.2.19 host 24.1.2.1
+PASSED
+
+ssh@PaloAlto> ping host 24.1.2.1
+FAILED
+
+
+
+DEFAULT IP ROUTES
+
+# Display current IP Routes
+ssh@PaloAlto> show routing route
+
+# HTTPS
+# Network tab > Virtual Routers
+# Click on default
+    # Router Settings
+        # Name: Virtual_Router
+    # Static Routes
+        # Add
+            # Name: Default Route A
+            # Destination: 0.0.0.0/0
+            # Interface: ethernet1/4
+            # Next Hop: IP ADDRESS : 23.1.2.1
+            # Admin Distance: 10
+            # Metric: 10
+        # OK
+
+         # Add
+            # Name: Default Route B
+            # Destination: 0.0.0.0/0
+            # Interface: ethernet1/5
+            # Next Hop: IP ADDRESS : 24.1.2.1
+            # Admin Distance: 20
+            # Metric: 20
+        # OK
+
+# CLICK COMMIT
+
+# Verify the Route was added
+
+ssh@PaloAlto> show routing route
+ssh@PaloAlto> ping source 23.1.2.19 host 8.8.8.8
+
+# HTTP 
+# Device tab > Troubleshooting
+# Test Configuration
+    # Select Test: Ping
+    # Source: 23.1.2.19
+    # Host: 8.8.8.8
+    # EXECUTE
+
+
+
+8
+DHCP Services
+
+# HTTPS
+# Network Tab > DHCP
+    # Interface: ethernet1/1
+    # Mode: Auto
+    # Lease
+        # 🗹 Ping IP when...
+        # IP Pools
+            # Add
+            # 10.10.0.51-10.10.0.99
+    # Options
+        # Gateway: 10.10.0.19
+        # Subnet Mask: 255.255.255.0
+        # Primary DNS: 10.10.0.100
+    # OK
+
+# CLICK COMMIT
+
+
+
+SOURCE NAT CONFIGURATION
+# HTTPS
+# Policies tab > NAT
+# Add
+    # General
+        # Name: SNAT_in_to_out
+    # Original Packet
+        # Source Zone: inside
+        # Destination Zone: Outside
+        # Destination Interface: ethernet1/4
+        # Source Address:
+            # Name: Subnet 10.10
+            # Type: IP Netmask : 10.10.0.0/24
+    # Translated Packet
+        # Translation Type: Dynamic IP and Port
+        # Address Type: Interface Address
+        # Interface: ethernet1/4
+        # IP Address: 23.1.2.19/24
+    # OK
+
+# Test the rule
+ssh@PaloAlto> test nat-policy-match from inside to outside source 10.10.0.51 destination 8.8.8.8 protocol 1
+
+# HTTP
+# Policies tab > Test Policy Match
+    # From: Inside
+    # To: Outside
+    # Source: 10.10.0.51
+    # Destination: 8.8.8.8
+    # EXECUTE
+
+
+
+
+INITIAL SECURITY POLICY
+# HTTPS
+# Policies tab > Security
+# Add
+    # General
+        # Name: Inside to Outside
+    # Source
+        # Source Zone: inside
+        # Source Address: Subnet 10.10
+    # Destination
+        # Destination Zone: outside
+        # Destination Address: 🗹 ANY
+    # Application
+        # 🗹 ANY
+    # Service/URL Category
+        # 🗹 ANY
+    # Actions
+        # Action Setting: Action : Allow
+        # Log Setting: 🗹 Log at Session End
+    # OK
+
+# CLICK COMMIT
+
+# TEST IT on the host machine by connecting to the internet
+# HTTPS
+# Monitor tab > Traffic
+# Monitor tab > Session Browser
+
+
+
+
+DECRYPTION (SSL Forward Proxy)
+# HTTPS
+# Device tab > Certificate Management > Certificates > Device Certificates
+# Export your .cer file from your Certificate Authority Server
+# Import the file (bottom of screen)
+# name the Certificate ( Enterprise_CA )
+# File Format: Base64 (or whatever it is encoded in)
+# Click on the cert
+    # 🗹 Trusted Root CA
+# Generate
+    # Name: Cert_Fwd_Proxy
+    # Common Name: Cert_For_Forward_Proxy
+    # Signed by: External Authority
+    # 🗹 Certificate Authority
+    # GENERATE
+# Click on the generated cert
+# Export Certificate (Bottom)
+# Upload it to the CA Server
+# Generate the Certificate on the CA server
+# Download cert from CA server
+# Copy the name from the request on the PA HTTPS client
+# IMPORT
+# Upload the new .cer file
+# Name: Same name as above
+# Click on the name
+    # 🗹 Forward Trust Certificate
+
+# Redo above steps to regenerate an "Untrust" Cert
+
+# Objects tab > Decryption > Decription Profile
+# Add
+    # Name: Decryption_Profile1
+    # SSL Decryption
+        # 🗹 Block sessions with expired certificates
+        # 🗹 Block sessions with untristed issuers
+        # 🗹 Block sessions with unspported versions
+        # 🗹 Block sessions with unsupported cipher suites
+        # 🗹 Block sessions with client authentication
+    # SSL Protocol Settings
+        # Configure this as needed
+
+# Policies Tab > Decryption
+# Add
+    # General
+        # Name: Decrypt
+    # Source
+        # Source Zone: inside
+        # Source Address: Subnet 10.10
+    # Destination
+        # Destination Zone: outside
+        # Destination Address: 🗹 Any
+    # Service/URL Category
+        # Service: service-https
+    # Options
+        # Action: Decrypt
+        # Type : SSL Forward Proxy
+        # Decryption Profile: Dcryption_Profile1
+        # 🗹 Log Successful SSL Handshake (may slow down system)
+        # 🗹 Log Unsuccessful SSL Handshake 
+    # OK
+
+# CLICK COMMIT 
