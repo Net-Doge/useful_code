@@ -1,0 +1,49 @@
+set up an indexer (reciever)
+
+log into enterprise
+settings > Data > Forwarding and Recieving
+Configure recieving > add new
+
+Listen on port: 1234
+
+###bash command
+./splunk enable listen
+
+download universal forwarder from the splunk webpage
+"Free splunk"
+Login to account
+
+from the download page, scroll down to the bottom and download Splunk Universal forwarder
+select OS and versions
+
+there's also a WGET line you can use on the server.
+
+
+### INSTALL IN ANY DIRECTORY ###
+#!/bin/bash
+
+#unzip the tarball
+sudo tar xvzf splunkforwarder-linux-x86_64.tgz -C /opt
+cd /opt/splunkforwarder/bin
+
+### start the forwarder and auto accept the license
+./splunk start --accept-license
+
+### here you're asksed to make an admin account
+user: admin
+pass: admin 
+confirm: admin
+
+### start when the server reboots
+./splunk enable boot-start -user "USER"
+
+### send data to listening indexer
+./splunk add forward-server INDEXER_IP:PORT
+username: admin
+password: admin
+
+### send the logs from the www1 folder to splunk for indexing
+./splunk add monitor -auth admin:goodPassword /opt/log/www1
+
+
+### RETURN TO THE INDEXER AND OBSERVE LOGS BEING COLLECTED.
