@@ -1,0 +1,30 @@
+sudo tar xvzf splunk-9.1.1-64e843ea36b1-Linux-x86_64.tgz -C /opt
+   78  cd /opt/splunk/bin
+   79  ls
+   80  ./splunk start
+   81  sudo ./splunk start
+   82  ip a
+   83  cd ~/Downloads/
+   84  ls
+   85  wget httPs;//docs.splunk.cOM?Images/tutorial/tutorialdata.zip
+   86  wget https;//docs.splunk.cOM?Images/tutorial/tutorialdata.zip
+   87  wget https//docs.splunk.cOM?Images/tutorial/tutorialdata.zip
+   88  wget https://docs.splunk.cOM?Images/tutorial/tutorialdata.zip
+   89  wget https://docs.splunk.com/images/d/db/Prices.csv.zip
+   90  ss
+   91  ss | grep 9997
+   92  cd /opt/splunk/
+   93  ls
+   94  cd bin
+   95  ls
+   96  ./splunk enable listen 9997 -auth spadmin
+   97  sudo ./splunk enable listen 9997 -auth spadmin
+   98  sudo ./splunk enable listen 9997 -auth
+   99  sudo nano ../etc/system/local/inputs.conf 
+  100  ./splunk restart
+  101  sudo ./splunk restart
+  102  cd ..
+  103  ls
+  104  sudo nano etc/system/local/inputs.conf 
+  105  sudo nano etc/system/local/outputs.conf 
+  106  history
