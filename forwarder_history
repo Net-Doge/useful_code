@@ -1,0 +1,39 @@
+  128  useradd -m splunkfwd
+  129  groupadd splunkfwd
+  130  export SPLUNK_HOME="/opt/splunkforwarder"
+  131  mkdir $SPLUNK_HOME
+  132  cd ~
+  133  ls
+  134  pwd
+  135  cd /home/kali
+  136  ls
+  137  mv splunkforwarder-9.1.1-64e843ea36b1-linux-2.6-amd64.deb /opt/splunkforwarder
+  138  cd /opt/splunkforwarder
+  139  ls
+  140  dpkg -i splunkforwarder-9.1.1-64e843ea36b1-linux-2.6-amd64.deb
+  141  chown -R splunkfwd:splunkfwd $SPLUNK_HOME
+  142  cd bin
+  143  ls
+  144  ./splunk start
+  145  cd ../etc/system/local
+  146  ls
+  147  touch outputs.conf
+  148  ls
+  149  touch inputs.conf
+  150  ls -lisa
+  151  chown -R splunkfwd:splunkfwd inputs.conf
+  152  ls -lisa
+  153  chown -R splunkfwd:splunkfwd outputs.conf
+  154  ls -lisa
+  155  touch deploymentclient.conf
+  156  chown -R splunkfwd:splunkfwd deploymentclient.conf
+  157  ls -lisa
+  158  cd ../../../bin
+  159  ./splunk add forward-server 192.168.191.11:9997
+  160  ./splunk set deploy-poll 192.168.191.11:8089
+  161  ./splunk add monitor /var/log
+  162  ./splunk restart
+  163  nano ../etc/system/local/outputs.conf
+  164  exit
+  165  nano splunkforwarder/etc/system/local/outputs.conf
+  166  nano splunkforwarder/etc/system/local/inputs.conf
